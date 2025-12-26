@@ -1,0 +1,316 @@
+CELL #1
+from crewai import Agent
+
+senior_technical_writer = Agent(
+
+    role="Senior Technical Writer",
+    
+    goal="""Craft clear, engaging, and well-structured
+            technical content based on research findings""",
+    
+    backstory="""You are an experienced technical writer
+                 with expertise in simplifying complex
+                 concepts, structuring content for readability,
+                 and ensuring accuracy in documentation.""",
+                 
+    verbose=True  # Enable logging for debugging
+)
+
+CELL #2
+from crewai import LLM 
+
+llm = LLM(
+    model="ollama/llama3.2:1b",
+    base_url="http://localhost:11434"
+)
+
+CELL #3
+from crewai import Agent
+
+senior_technical_writer = Agent(
+
+    role="Senior Technical Writer",
+    
+    goal="""Craft clear, engaging, and well-structured
+            technical content based on research findings""",
+    
+    backstory="""You are an experienced technical writer
+                 with expertise in simplifying complex
+                 concepts, structuring content for readability,
+                 and ensuring accuracy in documentation.""",
+                 
+    llm=llm,
+                 
+    verbose=True
+)
+
+CELL #4
+from crewai import Task
+
+writing_task = Task(
+    description="""Write a well-structured, engaging,
+                   and technically accurate article
+                   on {topic}.""",
+    
+    agent=senior_technical_writer, 
+    
+    
+    expected_output="""A polished, detailed, and easy-to-read
+                       article on the given topic.""",
+)
+
+CELL #5
+from crewai import Crew
+
+crew = Crew(
+    agents=[senior_technical_writer],
+    tasks=[writing_task],
+    verbose=True
+)
+
+response = crew.kickoff(inputs={"topic":"AI Agents"})
+
+=====================Research Agent====================
+The libraries are already installed in the classroom. If you're running this notebook on your own machine, you can install the following:
+
+!pip install crewai==0.28.8 crewai_tools==0.1.6 langchain_community==0.0.29
+
+CELL #6
+from crewai import Agent, Task, Crew
+
+CELL #7
+import os
+from utils import get_openai_api_key
+
+openai_api_key = get_openai_api_key()
+os.environ["OPENAI_MODEL_NAME"] = 'gpt-3.5-turbo'
+
+CELL #8
+planner = Agent(
+    role="Content Planner",
+    goal="Plan engaging and factually accurate content on {topic}",
+    backstory="You're working on planning a blog article "
+              "about the topic: {topic}."
+              "You collect information that helps the "
+              "audience learn something "
+              "and make informed decisions. "
+              "Your work is the basis for "
+              "the Content Writer to write an article on this topic.",
+    allow_delegation=False,
+	verbose=True
+)
+
+CELL #9
+
+writer = Agent(
+    role="Content Writer",
+    goal="Write insightful and factually accurate "
+         "opinion piece about the topic: {topic}",
+    backstory="You're working on a writing "
+              "a new opinion piece about the topic: {topic}. "
+              "You base your writing on the work of "
+              "the Content Planner, who provides an outline "
+              "and relevant context about the topic. "
+              "You follow the main objectives and "
+              "direction of the outline, "
+              "as provide by the Content Planner. "
+              "You also provide objective and impartial insights "
+              "and back them up with information "
+              "provide by the Content Planner. "
+              "You acknowledge in your opinion piece "
+              "when your statements are opinions "
+              "as opposed to objective statements.",
+    allow_delegation=False,
+    verbose=True
+)
+
+CELL #10
+
+editor = Agent(
+    role="Editor",
+    goal="Edit a given blog post to align with "
+         "the writing style of the organization. ",
+    backstory="You are an editor who receives a blog post "
+              "from the Content Writer. "
+              "Your goal is to review the blog post "
+              "to ensure that it follows journalistic best practices,"
+              "provides balanced viewpoints "
+              "when providing opinions or assertions, "
+              "and also avoids major controversial topics "
+              "or opinions when possible.",
+    allow_delegation=False,
+    verbose=True
+)
+
+CELL #11
+
+plan = Task(
+    description=(
+        "1. Prioritize the latest trends, key players, "
+            "and noteworthy news on {topic}.\n"
+        "2. Identify the target audience, considering "
+            "their interests and pain points.\n"
+        "3. Develop a detailed content outline including "
+            "an introduction, key points, and a call to action.\n"
+        "4. Include SEO keywords and relevant data or sources."
+    ),
+    expected_output="A comprehensive content plan document "
+        "with an outline, audience analysis, "
+        "SEO keywords, and resources.",
+    agent=planner,
+)
+
+CELL #12
+write = Task(
+    description=(
+        "1. Use the content plan to craft a compelling "
+            "blog post on {topic}.\n"
+        "2. Incorporate SEO keywords naturally.\n"
+		"3. Sections/Subtitles are properly named "
+            "in an engaging manner.\n"
+        "4. Ensure the post is structured with an "
+            "engaging introduction, insightful body, "
+            "and a summarizing conclusion.\n"
+        "5. Proofread for grammatical errors and "
+            "alignment with the brand's voice.\n"
+    ),
+    expected_output="A well-written blog post "
+        "in markdown format, ready for publication, "
+        "each section should have 2 or 3 paragraphs.",
+    agent=writer,
+)
+
+CELL #13
+
+edit = Task(
+    description=("Proofread the given blog post for "
+                 "grammatical errors and "
+                 "alignment with the brand's voice."),
+    expected_output="A well-written blog post in markdown format, "
+                    "ready for publication, "
+                    "each section should have 2 or 3 paragraphs.",
+    agent=editor
+)
+
+CELL #14
+
+crew = Crew(
+    agents=[planner, writer, editor],
+    tasks=[plan, write, edit],
+    verbose=2
+)
+
+CELL #16
+CELL #17
+CELL #18
+CELL #19
+CELL #20
+CELL #21
+
+executive_coach = Agent(
+    role="Executive Coach Specialist for Interview Preparation",
+    goal="Coach job seeker to get hired as Chief Technology Officer (CTO) at {company}",
+    backstory="You're a seasoned and experienced executive coach that is coaching a job seeker to prepare for a CTO interview at {company}. "
+              "You provide expert advice and strategies to help them excel in the interview."
+              "You train them to constantly link technology choices to P&L (Profit and Loss). "
+              "You help them differentiate between humility and insecurity. "
+              "You understand the current technology landscape and its impact on business strategy that is relevant to {company}. "
+              "You know that C-level interviews are 50% about competence and 50% about confidence"
+              "Your work is the basis for "
+              "the Interview Researcher to research and put together a comprehensive guide for interview preparation at {company}.",
+    allow_delegation=False,
+	verbose=True
+)
+
+interview_researcher = Agent(
+    role="Interview Researcher",
+    goal="Conduct in-depth research on {company} using the interview preparation guide created by executive coach.",
+    backstory="You're working on researching {company} to prepare a comprehensive guide for a CTO job interview. "
+              "You base your research on various sources to compile a detailed profile of the company, "
+              "including its product and services, operations, financials, tech stack, leadership team, and industry landscape. "
+              "You use various sources such as the company's website, news articles, press releases, industry reports, and social media profiles to gather relevant information. "
+              "You analyze the information to identify key trends, challenges, and opportunities that may impact the company's operations and growth prospects. "
+              "Your work is essential for the Mock Interviewer to provide tailored interview questions and sample answers to the job seeker."
+              "You collaborate with the Executive Coach, who provides an outline and context for your research. "
+              "and you ensure that your research aligns with the coaching strategies and objectives set by the Executive Coach."
+              "You follow the main objectives and "
+              "direction of the outline, "
+              "as provide by the Executive Coach. "
+              "You ensure that your research is comprehensive, accurate, and relevant to the job seeker's interview preparation needs." ,
+    allow_delegation=False,
+    verbose=True
+)
+
+coaching_plan = Task(
+    description=(
+        "1. Create personal brand and positioning for CTO role at {company}. "
+            "For example, “scaleup SaaS CTO, strong in cloud-native architecture and building senior engineering leadership”.\n"
+        "2. Leadership and executive presence coaching: "
+            "Help the job seeker understand their leadership style and how to effectively communicate their vision and strategy. "
+            "This includes speaking to the board, storytelling with data, managing conflict with peers, and handling underperformance at VP/Director level. "
+            "communication to non-technical stakeholders: explaining trade-offs, risk, ROI, and technology strategy in concise, business-first language.\n"
+        "3. candidate describes their current architecture, technical strategy, and roadmap so it sounds coherent, robust, and business-aligned.\n"
+        "4. Prepare answers to common CTO interview questions, including technical questions, leadership questions, "
+            "and situational questions.\n"
+        "5. Conduct mock interviews to practice answering questions and receiving feedback.\n"
+        "6. Identify 3 to 5“signature” initiatives with quantifiable impact (e.g., uptime, revenue, margins, velocity, cost reduction, security posture) and weave them into interview answers."
+    ),
+    expected_output="A detailed, comprehensive and relevant interview preparation guide for someone interviewing for a Chief Technology Officer position.",
+    agent=executive_coach,
+)
+
+company_research = Task(
+    description=(
+        "1. Use the coaching plan to do a comprehensive in-depth research on {company}.\n"
+		"2. Sections/Subtitles are properly named that are relevant for the interview preparation process"
+        "3. Ensure the research report is structured to assist with interview preparation, "
+            "gather insights, examples, and data points relevant to the CTO role at {company}.\n"
+        "4. Ensure research report will help the job seeker understand the company's technology landscape, "
+            "and competitive positioning.\n"
+        "5. Include relevant data, sources, and references to help prepare a 30-60-90 day plan.\n"
+        "6. Use markdown format for the report.\n"
+        "7. Each section should have 3 or 4 paragraphs.\n"
+    ),
+    expected_output="A very exhaustive and detailed research report "
+        "in markdown format, very helpful for the interviewer to prepare the interview "
+        "sample questions and asnwers and the various rounds of interviews with the CEO, Board, Senior Vice Presidents "
+        "and each section should have 3 or 4 paragraphs.",
+    agent=interview_researcher,
+)
+
+========== Single Agent OLD ====================
+
+comapny_research_agent = Agent(
+        role="Company Research Specialist",
+        
+        goal="Conduct in-depth research on {company}"
+                "to gather insights about its products, services,"
+                "market position, competitors, and recent developments in the context of a CTO job interview preparation.",
+        
+        backstory="""You are a skilled researcher with expertise in gathering
+                    and analyzing information about companies.
+                    You excel at using various sources to compile comprehensive
+                    profiles that highlight key aspects about {company} to prepare for a CTO job interview.""",
+                    
+        verbose=True
+    )
+
+company_research_task = Task(
+        description="""You should conduct an in-depth research on {company} for CTO job interview preparation.""",
+        agent=comapny_research_agent,
+        expected_output="""A comprehensive research report on {company}, 
+        including insights about its company's operations, company's financials 
+        and the company leadership team, products, services, market position, 
+        competitors, and recent developments.""",
+    )
+
+    crew = Crew(
+        agents=[comapny_research_agent],
+        tasks=[company_research_task],
+        verbose=2
+    )
+
+response = crew.kickoff(inputs={"company":"MSCI Inc."})
+
+from IPython.display import Markdown
+Markdown(response)
