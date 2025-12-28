@@ -277,6 +277,28 @@ company_research = Task(
         "and each section should have 3 or 4 paragraphs.",
     agent=interview_researcher,
 )
+================== Tools ======================
+from crewai_tools import SerperDevTool, \
+                         ScrapeWebsiteTool, \
+                         WebsiteSearchTool
+
+Some ways of using CrewAI tools.
+search_tool = SerperDevTool()
+scrape_tool = ScrapeWebsiteTool()
+
+docs_scrape_tool = ScrapeWebsiteTool(
+    website_url="https://docs.crewai.com/how-to/Creating-a-Crew-and-kick-it-off/"
+)
+
+crew = Crew(
+  agents=[support_agent, support_quality_assurance_agent],
+  tasks=[inquiry_resolution, quality_assurance_review],
+  verbose=2,
+  memory=True
+)
+
+By not setting allow_delegation=False, allow_delegation takes its default value of being True.
+This means the agent can delegate its work to another agent which is better suited to do a particular task.
 
 ========== Single Agent OLD ====================
 
